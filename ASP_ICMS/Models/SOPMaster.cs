@@ -5,7 +5,7 @@ namespace ASP_ICMS.Models
 {
     public class SOPMaster
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         [Required]
         public string SOPCode { get; set; } = null!;
         [Required]

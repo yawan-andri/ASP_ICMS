@@ -17,5 +17,7 @@ namespace ASP_ICMS.Data
 
         public DbSet<SOPMaster> SOPMaster { get; set; }
         public DbSet<ChoiceList> ChoiceList { get; set; }
+        public DbSet<SOPMasterType> SOPMasterType { get; set; }
+        public DbSet<SOPMasterAuditType> SOPMasterAuditType { get; set; }
     }
 }

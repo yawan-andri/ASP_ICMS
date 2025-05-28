@@ -4,6 +4,7 @@ using ASP_ICMS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASP_ICMS.Migrations
 {
     [DbContext(typeof(ASP_ICMSContext))]
-    partial class ASP_ICMSContextModelSnapshot : ModelSnapshot
+    [Migration("20250528014404_Add table type")]
+    partial class Addtabletype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +49,7 @@ namespace ASP_ICMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChoiceList", (string)null);
+                    b.ToTable("ChoiceList");
                 });
 
             modelBuilder.Entity("ASP_ICMS.Models.SOPMaster", b =>
@@ -75,7 +78,7 @@ namespace ASP_ICMS.Migrations
 
                     b.HasIndex("DivisionId");
 
-                    b.ToTable("SOPMaster", (string)null);
+                    b.ToTable("SOPMaster");
                 });
 
             modelBuilder.Entity("ASP_ICMS.Models.SOPMaster", b =>
