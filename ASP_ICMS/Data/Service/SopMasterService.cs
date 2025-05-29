@@ -13,9 +13,13 @@ namespace ASP_ICMS.Data.Service
         public async Task<IEnumerable<SOPMaster>> GetSOPMaster()
         {
             return await _context.SOPMaster
-                .Include(s => s.Division)
-                .Where(s => s.Status)
-                .ToListAsync();
-        }
+		        .Where(s => s.Status)
+		        .Include(s => s.Division)
+		        .Include(s => s.SOPTypes.OrderByDescending(t => t.DateAdd))
+			        .ThenInclude(t => t.SOPType)
+		        .Include(s => s.AuditTypes.OrderByDescending(a => a.DateAdd))
+			        .ThenInclude(a => a.SOPAuditType)
+		        .ToListAsync();
+		}
     }
 }

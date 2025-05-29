@@ -12,7 +12,53 @@ namespace ASP_ICMS.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+			// SOPMaster
+			modelBuilder.Entity<SOPMaster>()
+					 .HasKey(s => s.Id);
+
+			modelBuilder.Entity<SOPMaster>()
+				.HasOne(s => s.Division)
+				.WithMany(c => c.SOPMasters)
+				.HasForeignKey(s => s.DivisionId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			// ChoiceList
+			modelBuilder.Entity<ChoiceList>()
+				.HasKey(c => c.Id);
+
+			// SOPMasterAuditType
+			modelBuilder.Entity<SOPMasterAuditType>()
+				.HasKey(a => a.Id);
+
+			modelBuilder.Entity<SOPMasterAuditType>()
+				.HasOne(a => a.SOPMaster)
+				.WithMany(s => s.AuditTypes)
+				.HasForeignKey(a => a.SOPMasterId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<SOPMasterAuditType>()
+				.HasOne(a => a.SOPAuditType)
+				.WithMany(c => c.SOPAuditTypes)
+				.HasForeignKey(a => a.SOPAuditTypeId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			// SOPMasterType
+			modelBuilder.Entity<SOPMasterType>()
+				.HasKey(t => t.Id);
+
+			modelBuilder.Entity<SOPMasterType>()
+				.HasOne(t => t.SOPMaster)
+				.WithMany(s => s.SOPTypes)
+				.HasForeignKey(t => t.SOPMasterId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			modelBuilder.Entity<SOPMasterType>()
+				.HasOne(t => t.SOPType)
+				.WithMany(c => c.SOPTypes)
+				.HasForeignKey(t => t.SOPTypeId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<SOPMaster> SOPMaster { get; set; }

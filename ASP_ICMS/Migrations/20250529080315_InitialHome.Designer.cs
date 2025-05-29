@@ -4,6 +4,7 @@ using ASP_ICMS.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASP_ICMS.Migrations
 {
     [DbContext(typeof(ASP_ICMSContext))]
-    partial class ASP_ICMSContextModelSnapshot : ModelSnapshot
+    [Migration("20250529080315_InitialHome")]
+    partial class InitialHome
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +44,7 @@ namespace ASP_ICMS.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("StatusDate")
+                    b.Property<DateTime>("StatusDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -71,7 +74,7 @@ namespace ASP_ICMS.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("StatusDate")
+                    b.Property<DateTime>("StatusDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
