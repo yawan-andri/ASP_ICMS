@@ -5,9 +5,113 @@
 }
 
 <div class="container">
-	<h2 class="text-center">SOP Master</h2>
-	<div id="sopMasterTable">
+	<h3 class="text-center">SOP Master</h3>
+
+	<button type ="button"
+		class="btn btn-outline-success btn-sm mt-3 mb-3"
+		data-bs-toggle="modal"
+		data-bs-target="#createSOPMaster">
+		Add SOP Master
+	</button>
+
+	<div id="sopMasterTable" class="table-responsive">
 		@await Html.PartialAsync("_SOPMasterIndexPartial", Model)
 	</div>
 </div>
 
+<div class="modal fade" id="createSOPMaster" tabindex="-1" aria-labelledby="createSOPMasterModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<form id="createSOPMasterForm" method="post" action="/SOPMaster/Create">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createSOPMasterModalLabel">Add SOP Master</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label for="SOPCode" class="form-label">No SOP</label>
+						<input type="text" class="form-control" name="SOPCode" required />
+					</div>
+					<div class="mb-3">
+						<label for="SOPName" class="form-label">Nama SOP</label>
+						<input type="text" class="form-control" name="SOPName" required />
+					</div>
+					<div class="mb-3">
+						<label for="DivisionId" class="form-label">Divisi</label>
+						<select class="form-control" name="DivisionId" id="DivisionId" required>
+							<option value="">-- Select Division --</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="SOPTypeId" class="form-label">SOP Type</label>
+						<select class="form-control" name="SOPTypeId" id="SOPTypeId" required>
+							<option value="">-- Select SOP Type --</option>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="SOPAuditTypeId" class="form-label">SOP Audit Type</label>
+						<select class="form-control" name="SOPAuditTypeId" id="SOPAuditTypeId" required>
+							<option value="">-- Select SOP Audit Type --</option>
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+			// Load data dropdown saat modal dibuka
+			$('#createSOPMaster').on('show.bs.modal', function () {
+				loadDropdown('/SOPMaster/GetDivisionList', '#DivisionId', '-- Select Division --');
+				loadDropdown('/SOPMaster/GetSOPTypeList', '#SOPTypeId', '-- Select SOP Type --');
+				loadDropdown('/SOPMaster/GetSOPAuditTypeList', '#SOPAuditTypeId', '-- Select SOP Audit Type --');
+			});
+
+			function loadDropdown(url, elementId, placeholder) {
+				$.ajax({
+					url: url,
+					method: 'GET',
+					success: function (data) {
+						const dropdown = $(elementId);
+						dropdown.empty();
+						dropdown.append($('<option>', { value: '', text: placeholder }));
+						$.each(data, function (i, item) {
+							dropdown.append($('<option>', {
+								value: item.id,
+								text: item.choiceName
+							}));
+						});
+					}
+				});
+			}
+
+			// Ajax submit form
+			$('#createSOPMasterForm').submit(function (e) {
+				e.preventDefault();
+				const form = $(this);
+				$.ajax({
+					type: 'POST',
+					url: form.attr('action'),
+					data: form.serialize(),
+					success: function () {
+						$('#createSOPMaster').modal('hide');
+						$('#expensesTable').load('/SOPMaster/SOPMasterTablePartial');
+						form.trigger('reset');
+						alert('SOP Master berhasil ditambahkan.');
+					},
+					error: function () {
+						alert('Gagal menambahkan SOP Master. Periksa kembali data Anda.');
+					}
+				});
+			});
+		});
+	</script>
+}

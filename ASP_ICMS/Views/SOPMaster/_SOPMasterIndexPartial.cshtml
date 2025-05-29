@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<ASP_ICMS.Models.SOPMaster>
 
-<table class="table table-bordered mt-3">
+
+<table class="table table-bordered table-hover border-dark-subtle align-middle caption-top">
+	<caption>List of SOP</caption>
 	<thead class="table-light">
 		<tr>
 			<th>No SOP</th>
@@ -11,15 +13,15 @@
 			<th>Action</th>
 		</tr>
 	</thead>
-	<tbody>
+	<tbody class="table-group-divider">
 		@foreach (var SOPMaster in Model)
 		{
 			<tr>
 				<td>@SOPMaster.SOPCode</td>
 				<td>@SOPMaster.SOPName</td>
 				<td>@SOPMaster.Division?.ChoiceName</td>
-				<td></td>
-				<td></td>
+				<td>@SOPMaster.SOPTypes.FirstOrDefault()?.SOPType?.ChoiceName</td>
+				<td>@SOPMaster.AuditTypes.FirstOrDefault()?.SOPAuditType?.ChoiceName</td>
 				<td>
 					@* <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Details", "SOPMaster", new { id = SOPMaster.SOPId })">Detail</a> *@
 					@* <a class="btn btn-outline-warning btn-sm" href="@Url.Action("Edit", "SOPMaster", new { id = SOPMaster.SOPId })">Edit</a> *@
@@ -29,3 +31,4 @@
 		}
 	</tbody>
 </table>
+
