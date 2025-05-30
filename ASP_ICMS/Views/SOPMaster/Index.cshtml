@@ -4,7 +4,7 @@
 	ViewData["Title"] = "SOP Master";
 }
 
-<div class="container">
+<div class="container-fluid">
 	<h3 class="text-center">SOP Master</h3>
 
 	<button type ="button"
@@ -13,7 +13,6 @@
 		data-bs-target="#createSOPMaster">
 		Add SOP Master
 	</button>
-
 	<div id="sopMasterTable" class="table-responsive">
 		@await Html.PartialAsync("_SOPMasterIndexPartial", Model)
 	</div>
@@ -75,6 +74,7 @@
 				loadDropdown('/SOPMaster/GetSOPAuditTypeList', '#SOPAuditTypeId', '-- Select SOP Audit Type --');
 			});
 
+			// Fungsi inisialisasi load data dropdown
 			function loadDropdown(url, elementId, placeholder) {
 				$.ajax({
 					url: url,
