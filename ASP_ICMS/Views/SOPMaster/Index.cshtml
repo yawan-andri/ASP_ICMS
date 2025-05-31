@@ -103,9 +103,9 @@
 					data: form.serialize(),
 					success: function () {
 						$('#createSOPMaster').modal('hide');
-						$('#expensesTable').load('/SOPMaster/SOPMasterTablePartial');
+						$('#sopMasterTable').load('/SOPMaster/SOPMasterTablePartial');
 						form.trigger('reset');
-						alert('SOP Master berhasil ditambahkan.');
+						// alert('SOP Master berhasil ditambahkan.');
 					},
 					error: function () {
 						alert('Gagal menambahkan SOP Master. Periksa kembali data Anda.');

@@ -1,4 +1,5 @@
 ﻿using ASP_ICMS.Models;
+using ASP_ICMS.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -44,5 +45,40 @@ namespace ASP_ICMS.Data.Service
 				.OrderBy(c => c.ChoiceName)
 				.ToListAsync();
 		}
+		public async Task<bool> CreateSOPMasterAsync(CreateSOPMasterViewModel model)
+		{
+			if (model == null) return false;
+
+			var sopMaster = new SOPMaster
+			{
+				SOPCode = model.SOPCode,
+				SOPName = model.SOPName,
+				DivisionId = model.DivisionId,
+				StatusDate = DateTime.Now,
+				Status = true,
+				SOPTypes = new List<SOPMasterType>
+		{
+			new SOPMasterType
+			{
+				SOPTypeId = model.SOPTypeId,
+				DateAdd = DateTime.Now
+			}
+		},
+				AuditTypes = new List<SOPMasterAuditType>
+		{
+			new SOPMasterAuditType
+			{
+				SOPAuditTypeId = model.SOPAuditTypeId,
+				Description = "", // Ubah jika perlu
+				DateAdd = DateTime.Now
+			}
+		}
+			};
+
+			_context.SOPMaster.Add(sopMaster);
+			await _context.SaveChangesAsync();
+			return true;
+		}
+
 	}
 }

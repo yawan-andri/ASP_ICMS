@@ -1,5 +1,8 @@
 ﻿using ASP_ICMS.Data.Service;
+using ASP_ICMS.Models;
+using ASP_ICMS.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASP_ICMS.Controllers
 {
@@ -39,6 +42,19 @@ namespace ASP_ICMS.Controllers
 		{
 			var sopaudittype = await _sopMasterService.GetChoicesByOption("SOP Audit Type");
 			return Json(sopaudittype);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Create([FromForm] CreateSOPMasterViewModel model)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest("Data tidak valid.");
+
+			var result = await _sopMasterService.CreateSOPMasterAsync(model);
+			if (!result)
+				return StatusCode(500, "Gagal menyimpan data.");
+
+			return Ok();
 		}
 	}
 }

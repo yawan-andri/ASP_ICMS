@@ -1,4 +1,5 @@
 ﻿using ASP_ICMS.Models;
+using ASP_ICMS.Models.DTOs;
 
 namespace ASP_ICMS.Data.Service
 {
@@ -6,5 +7,6 @@ namespace ASP_ICMS.Data.Service
     {
         Task<IEnumerable<SOPMaster>> GetSOPMaster();
 		Task<IEnumerable<ChoiceList>> GetChoicesByOption(string option);
+		Task<bool> CreateSOPMasterAsync(CreateSOPMasterViewModel model);
 	}
 }
