@@ -18,6 +18,7 @@
 	</div>
 </div>
 
+@* CREATE NEW MASTER SOP *@
 <div class="modal fade" id="createSOPMaster" tabindex="-1" aria-labelledby="createSOPMasterModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
@@ -61,6 +62,55 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@* UPDATE MASTER SOP *@
+
+<div class="modal fade" id="editSOPMaster" tabindex="-1" aria-labelledby="editSOPMasterModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<form id="editSOPMasterForm" method="post" action="/SOPMaster/Edit">
+				<div class="modal-header">
+					<h5 class="modal-title" id="editSOPMasterModalLabel">Edit SOP Master</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div id="editSOPAlert" class="alert alert-danger d-none" role="alert"></div>
+
+					<input type="hidden" name="Id" id="editId" />
+
+					<div class="mb-3">
+						<label for="editSOPCode" class="form-label">No SOP</label>
+						<input type="text" class="form-control" name="SOPCode" id="editSOPCode" required />
+					</div>
+					<div class="mb-3">
+						<label for="editSOPName" class="form-label">Nama SOP</label>
+						<input type="text" class="form-control" name="SOPName" id="editSOPName" required />
+					</div>
+					<div class="mb-3">
+						<label for="editDivisionId" class="form-label">Divisi</label>
+						<select class="form-control" name="DivisionId" id="editDivisionId" required></select>
+					</div>
+					<div class="mb-3">
+						<label for="editSOPTypeId" class="form-label">SOP Type</label>
+						<select class="form-control" name="SOPTypeId" id="editSOPTypeId" required></select>
+					</div>
+					<div class="mb-3">
+						<label for="editSOPAuditTypeId" class="form-label">SOP Audit Type</label>
+						<select class="form-control" name="SOPAuditTypeId" id="editSOPAuditTypeId" required></select>
+					</div>
+					<div class="mb-3" id="editDescriptionGroup" style="display: none;">
+						<label for="editDescription" class="form-label">Deskripsi</label>
+						<textarea class="form-control" name="Description" id="editDescription" rows="3"></textarea>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-outline-primary btn-sm">Update</button>
 					<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
 				</div>
 			</form>
@@ -150,5 +200,100 @@
 				});
 			});
 		});
+
+		// Edit master SOP
+		$(document).on('click', '.btn-edit-sop', function () {
+			const btn = $(this);
+
+			const raw = btn.attr('data-sop');
+			let sop = {};
+			try {
+				sop = JSON.parse(raw);
+				console.log('SOP parsed from data-sop:', sop);
+				openEditModal(sop);
+			} catch (e) {
+				console.error('JSON parse error:', e);
+			}
+
+			console.log('SOP parsed from data-*:', sop);
+			openEditModal(sop);
+		});
+
+		function loadDropdown(url, selector, placeholder, onComplete) {
+			$.get(url, function (data) {
+				const dropdown = $(selector);
+				dropdown.empty();
+				dropdown.append(`<option value="">${placeholder}</option>`);
+				$.each(data, function (i, item) {
+					// Ganti sesuai properti aktual dari JSON
+					const value = item.value ?? item.id;
+					const text = item.text ?? item.name ?? item.choiceName ?? item.nama;
+					dropdown.append(`<option value="${value}">${text}</option>`);
+				});
+				if (typeof onComplete === "function") onComplete();
+			}).fail(function () {
+				alert(`Gagal memuat data dropdown untuk ${selector}`);
+			});
+		}	
+
+		function openEditModal(sop) {
+			// Reset alert
+			$('#editSOPAlert').addClass('d-none').empty().hide();
+
+			// Set form data
+			$('#editId').val(sop.id);
+			$('#editSOPCode').val(sop.sopCode);
+			$('#editSOPName').val(sop.sopName);
+			$('#editDescription').val(sop.description ?? '');
+
+			// Load dropdowns dan preselect
+			loadDropdown('/SOPMaster/GetDivisionList', '#editDivisionId', 'Select Division', function () {
+				$('#editDivisionId').val(sop.divisionId);
+			});
+
+			loadDropdown('/SOPMaster/GetSOPTypeList', '#editSOPTypeId', 'Select SOP Type', function () {
+				$('#editSOPTypeId').val(sop.sopTypeId);
+			});
+
+			loadDropdown('/SOPMaster/GetSOPAuditTypeList', '#editSOPAuditTypeId', 'Select SOP Audit Type', function () {
+				$('#editSOPAuditTypeId').val(sop.sopAuditTypeId).trigger('change');
+			});
+
+			$('#editSOPMaster').modal('show');
+		}
+
+		$(document).on('change', '#editSOPAuditTypeId', function () {
+			const selectedText = $("#editSOPAuditTypeId option:selected").text().trim().toUpperCase();
+			if (selectedText === "TIDAK AUDIT") {
+				$('#editDescriptionGroup').show();
+			} else {
+				$('#editDescriptionGroup').hide();
+				$('#editDescription').val('');
+			}
+		});
+
+		// Submit form
+		$('#editSOPMasterForm').submit(function (e) {
+			e.preventDefault();
+			const form = $(this);
+			const alertBox = $('#editSOPAlert');
+
+			alertBox.addClass('d-none').empty().hide();
+
+			$.ajax({
+				type: 'POST',
+				url: form.attr('action'),
+				data: form.serialize(),
+				success: function () {
+					$('#editSOPMaster').modal('hide');
+					$('#sopMasterTable').load('/SOPMaster/SOPMasterTablePartial');
+					form.trigger('reset');
+				},
+				error: function (xhr) {
+					alertBox.removeClass('d-none').show().text(xhr.responseText || 'Gagal memperbarui SOP Master.');
+				}
+			});
+		});
+
 	</script>
 }

@@ -21,4 +21,26 @@ namespace ASP_ICMS.Models.DTOs
 		
 		public string? Description { get; set; }
 	}
+	public class EditSOPMasterViewModel
+	{
+		public int Id { get; set; }
+
+		[Required]
+		public string SOPCode { get; set; }
+
+		[Required]
+		public string SOPName { get; set; }
+
+		[Required]
+		public int DivisionId { get; set; }
+
+		[Required]
+		public int SOPTypeId { get; set; }
+
+		[Required]
+		public int SOPAuditTypeId { get; set; }
+
+		public string? Description { get; set; }
+	}
+
 }

@@ -1,9 +1,10 @@
 ﻿@model IEnumerable<ASP_ICMS.Models.SOPMaster>
 
+@using System.Text.Encodings.Web
+@using System.Text.Json
 
 <table class="table table-bordered table-hover border-dark-subtle align-middle caption-top">
-	<caption>List of SOP</caption>
-	<thead class="table-light">
+	<thead>
 		<tr>
 			<th>No SOP</th>
 			<th>Nama SOP</th>
@@ -13,9 +14,23 @@
 			<th>Action</th>
 		</tr>
 	</thead>
-	<tbody class="table-group-divider">
+	<tbody>
 		@foreach (var SOPMaster in Model)
 		{
+			var sopObject = new
+			{
+				id = SOPMaster.Id,
+				sopCode = SOPMaster.SOPCode,
+				sopName = SOPMaster.SOPName,
+				divisionId = SOPMaster.DivisionId,
+				sopTypeId = SOPMaster.SOPTypes.FirstOrDefault()?.SOPTypeId,
+				sopAuditTypeId = SOPMaster.AuditTypes.FirstOrDefault()?.SOPAuditTypeId,
+				description = SOPMaster.AuditTypes.FirstOrDefault()?.Description
+			};
+
+			var sopJson = JsonSerializer.Serialize(sopObject);
+			var encodedJson = HtmlEncoder.Default.Encode(sopJson);
+
 			<tr>
 				<td>@SOPMaster.SOPCode</td>
 				<td>@SOPMaster.SOPName</td>
@@ -23,12 +38,12 @@
 				<td>@SOPMaster.SOPTypes.FirstOrDefault()?.SOPType?.ChoiceName</td>
 				<td>@SOPMaster.AuditTypes.FirstOrDefault()?.SOPAuditType?.ChoiceName</td>
 				<td>
-					@* <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Details", "SOPMaster", new { id = SOPMaster.SOPId })">Detail</a> *@
-					@* <a class="btn btn-outline-warning btn-sm" href="@Url.Action("Edit", "SOPMaster", new { id = SOPMaster.SOPId })">Edit</a> *@
-					@* <a class="btn btn-outline-danger btn-sm" href="@Url.Action("Delete", "SOPMaster", new { id = SOPMaster.SOPId })">Delete</a> *@
+					<button class="btn btn-sm btn-outline-warning btn-edit-sop"
+							data-sop='@Html.Raw(JsonSerializer.Serialize(sopObject))'>
+						Edit
+					</button>
 				</td>
 			</tr>
 		}
 	</tbody>
 </table>
-

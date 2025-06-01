@@ -16,13 +16,13 @@ namespace ASP_ICMS.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var sopMasters = await _sopMasterService.GetSOPMaster();
+            var sopMasters = await _sopMasterService.GetSOPMasterAsync();
             return View(sopMasters);
         }
 
         public async Task<IActionResult> SOPMasterTablePartial()
         {
-            var data = await _sopMasterService.GetSOPMaster();
+            var data = await _sopMasterService.GetSOPMasterAsync();
             return PartialView("_SOPMasterIndexPartial", data);
         }
 
@@ -62,6 +62,20 @@ namespace ASP_ICMS.Controllers
 
 			return Ok();
 		}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit([FromForm] EditSOPMasterViewModel model)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest("Data tidak valid.");
+
+			var result = await _sopMasterService.UpdateSOPMasterAsync(model);
+			if (!result)
+				return StatusCode(500, "Gagal memperbarui data.");
+
+			return Ok();
+		}
+
 	}
 }
 
