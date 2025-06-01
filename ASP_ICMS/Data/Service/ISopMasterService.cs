@@ -7,6 +7,7 @@ namespace ASP_ICMS.Data.Service
     {
         Task<IEnumerable<SOPMaster>> GetSOPMaster();
 		Task<IEnumerable<ChoiceList>> GetChoicesByOption(string option);
-		Task<bool> CreateSOPMasterAsync(CreateSOPMasterViewModel model);
+		Task<string> CheckDuplicateSOP(CreateSOPMasterViewModel model);
+		Task<bool> CreateSOPMaster(CreateSOPMasterViewModel model);
 	}
 }

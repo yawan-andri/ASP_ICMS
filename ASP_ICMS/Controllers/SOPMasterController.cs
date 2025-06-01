@@ -50,7 +50,13 @@ namespace ASP_ICMS.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest("Data tidak valid.");
 
-			var result = await _sopMasterService.CreateSOPMasterAsync(model);
+			var check = await _sopMasterService.CheckDuplicateSOP(model);
+			if (check == "DUPLICATE_CODE")
+				return Conflict("Kode SOP ini sudah dipakai, silahkan edit atau input kode baru.");
+			if (check == "DUPLICATE_NAME")
+				return Conflict("Nama SOP ini sudah dipakai, silahkan edit atau input nama sop baru.");
+
+			var result = await _sopMasterService.CreateSOPMaster(model);
 			if (!result)
 				return StatusCode(500, "Gagal menyimpan data.");
 

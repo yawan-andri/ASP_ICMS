@@ -27,6 +27,7 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
+					<div id="sopAlert" class="alert alert-danger d-none" role="alert"></div>
 					<div class="mb-3">
 						<label for="SOPCode" class="form-label">No SOP</label>
 						<input type="text" class="form-control" name="SOPCode" required />
@@ -38,20 +39,24 @@
 					<div class="mb-3">
 						<label for="DivisionId" class="form-label">Divisi</label>
 						<select class="form-control" name="DivisionId" id="DivisionId" required>
-							<option value="">-- Select Division --</option>
+							<option value="">Select Division</option>
 						</select>
 					</div>
 					<div class="mb-3">
 						<label for="SOPTypeId" class="form-label">SOP Type</label>
 						<select class="form-control" name="SOPTypeId" id="SOPTypeId" required>
-							<option value="">-- Select SOP Type --</option>
+							<option value="">Select SOP Type</option>
 						</select>
 					</div>
 					<div class="mb-3">
 						<label for="SOPAuditTypeId" class="form-label">SOP Audit Type</label>
 						<select class="form-control" name="SOPAuditTypeId" id="SOPAuditTypeId" required>
-							<option value="">-- Select SOP Audit Type --</option>
+							<option value="">Select SOP Audit Type</option>
 						</select>
+					</div>
+					<div class="mb-3" id="descriptionGroup" style="display: none;">
+						<label for="Description" class="form-label">Deskripsi</label>
+						<textarea class="form-control" name="Description" id="Description" rows="3"></textarea>
 					</div>
 				</div>
 				<div class="modal-footer">
@@ -69,34 +74,61 @@
 		$(document).ready(function () {
 			// Load data dropdown saat modal dibuka
 			$('#createSOPMaster').on('show.bs.modal', function () {
-				loadDropdown('/SOPMaster/GetDivisionList', '#DivisionId', '-- Select Division --');
-				loadDropdown('/SOPMaster/GetSOPTypeList', '#SOPTypeId', '-- Select SOP Type --');
-				loadDropdown('/SOPMaster/GetSOPAuditTypeList', '#SOPAuditTypeId', '-- Select SOP Audit Type --');
+
+				$('#sopAlert').addClass('d-none').empty().hide();
+
+				loadDropdown('/SOPMaster/GetDivisionList', '#DivisionId', 'Select Division');
+				loadDropdown('/SOPMaster/GetSOPTypeList', '#SOPTypeId', 'Select SOP Type');
+				loadDropdown('/SOPMaster/GetSOPAuditTypeList', '#SOPAuditTypeId', 'Select SOP Audit Type', function () {
+					// Trigger initial check after SOP Audit list loaded
+					$('#SOPAuditTypeId').trigger('change');
+				});
 			});
 
 			// Fungsi inisialisasi load data dropdown
-			function loadDropdown(url, elementId, placeholder) {
-				$.ajax({
-					url: url,
-					method: 'GET',
-					success: function (data) {
-						const dropdown = $(elementId);
-						dropdown.empty();
-						dropdown.append($('<option>', { value: '', text: placeholder }));
-						$.each(data, function (i, item) {
-							dropdown.append($('<option>', {
-								value: item.id,
-								text: item.choiceName
-							}));
-						});
-					}
-				});
-			}
+				function loadDropdown(url, elementId, placeholder, onDone) {
+					$.ajax({
+						url: url,
+						method: 'GET',
+						success: function (data) {
+							const dropdown = $(elementId);
+							dropdown.empty().append($('<option>', { value: '', text: placeholder }));
+
+							$.each(data, function (i, item) {
+								dropdown.append($('<option>', {
+									value: item.id,
+									text: item.choiceName
+								}));
+							});
+
+							if (onDone) onDone();
+						}
+					});
+				}
+
+			// Logic tampil/sembunyi description
+			$(document).on('change', '#SOPAuditTypeId', function () {
+				var selectedText = $("#SOPAuditTypeId option:selected").text().trim().toUpperCase();
+				if (selectedText === "AUDIT") {
+					$('#descriptionGroup').hide();
+					$('#Description').val('');
+					$('#Description').removeAttr('required');
+				} else if (selectedText === "TIDAK AUDIT") {
+					$('#descriptionGroup').show();
+					$('#Description').attr('required', 'required');
+				} else {
+					$('#descriptionGroup').hide();
+					$('#Description').val('');
+					$('#Description').removeAttr('required');
+				}
+			});
 
 			// Ajax submit form
 			$('#createSOPMasterForm').submit(function (e) {
 				e.preventDefault();
 				const form = $(this);
+				const alertBox = $('#sopAlert');
+				alertBox.addClass('d-none').text(''); // Reset alert
 				$.ajax({
 					type: 'POST',
 					url: form.attr('action'),
@@ -105,10 +137,15 @@
 						$('#createSOPMaster').modal('hide');
 						$('#sopMasterTable').load('/SOPMaster/SOPMasterTablePartial');
 						form.trigger('reset');
-						// alert('SOP Master berhasil ditambahkan.');
+
+						$('#sopAlert').addClass('d-none').empty().hide();
 					},
-					error: function () {
-						alert('Gagal menambahkan SOP Master. Periksa kembali data Anda.');
+					error: function (xhr) {
+						if (xhr.status === 409) {
+							$('#sopAlert').removeClass('d-none').show().text(xhr.responseText);
+						} else {
+							$('#sopAlert').removeClass('d-none').show().text('Gagal menambahkan SOP Master. Periksa kembali data Anda.');
+						}
 					}
 				});
 			});

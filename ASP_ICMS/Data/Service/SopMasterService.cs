@@ -45,40 +45,51 @@ namespace ASP_ICMS.Data.Service
 				.OrderBy(c => c.ChoiceName)
 				.ToListAsync();
 		}
-		public async Task<bool> CreateSOPMasterAsync(CreateSOPMasterViewModel model)
+
+		public async Task<string> CheckDuplicateSOP(CreateSOPMasterViewModel model)
 		{
-			if (model == null) return false;
+			if (await _context.SOPMaster.AnyAsync(s => s.SOPCode == model.SOPCode && s.Status))
+				return "DUPLICATE_CODE";
+
+			if (await _context.SOPMaster.AnyAsync(s => s.SOPName == model.SOPName && s.Status))
+				return "DUPLICATE_NAME";
+
+			return "OK";
+		}
+		public async Task<bool> CreateSOPMaster(CreateSOPMasterViewModel model)
+		{
+			var check = await CheckDuplicateSOP(model);
+			if (check != "OK") return false;
 
 			var sopMaster = new SOPMaster
 			{
-				SOPCode = model.SOPCode,
-				SOPName = model.SOPName,
+				SOPCode = model.SOPCode.ToUpper(),
+				SOPName = model.SOPName.ToUpper(),
 				DivisionId = model.DivisionId,
-				StatusDate = DateTime.Now,
+				StatusDate = null,
 				Status = true,
 				SOPTypes = new List<SOPMasterType>
-		{
-			new SOPMasterType
-			{
-				SOPTypeId = model.SOPTypeId,
-				DateAdd = DateTime.Now
-			}
-		},
+				{
+					new SOPMasterType
+					{
+						SOPTypeId = model.SOPTypeId,
+						DateAdd = DateTime.Now
+					}
+				},
 				AuditTypes = new List<SOPMasterAuditType>
-		{
-			new SOPMasterAuditType
-			{
-				SOPAuditTypeId = model.SOPAuditTypeId,
-				Description = "", // Ubah jika perlu
-				DateAdd = DateTime.Now
-			}
-		}
+				{
+					new SOPMasterAuditType
+					{
+						SOPAuditTypeId = model.SOPAuditTypeId,
+						Description =  (model.Description ?? "").ToUpper(),
+						DateAdd = DateTime.Now
+					}
+				}
 			};
 
 			_context.SOPMaster.Add(sopMaster);
 			await _context.SaveChangesAsync();
 			return true;
 		}
-
 	}
 }

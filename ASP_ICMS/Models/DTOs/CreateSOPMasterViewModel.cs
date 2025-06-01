@@ -18,5 +18,7 @@ namespace ASP_ICMS.Models.DTOs
 
 		[Required]
 		public int SOPAuditTypeId { get; set; }
+		
+		public string? Description { get; set; }
 	}
 }
